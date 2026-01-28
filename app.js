@@ -20,6 +20,13 @@ let cropper = null;
 window.onload = function() {
     setupDateDisplay();
     loadEdition(currentDateStr);
+    
+    // Add generic outside click to close modals
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = "none";
+        }
+    }
 };
 
 // 1. DATE & DISPLAY LOGIC
@@ -64,31 +71,24 @@ function updateViewer() {
     imgElement.onload = function() { imgElement.style.opacity = "1"; };
     imgElement.onerror = function() { imgElement.alt = "Page not found or uploading..."; };
 
-    // BUTTON STATES (Bottom Bar)
     document.getElementById('btnPrev').disabled = (currentPage === 1);
     document.getElementById('btnNext').disabled = (currentPage === totalPages);
 
-    // BUTTON STATES (Side Arrows)
-    // We use querySelector because they are classes
     const leftArr = document.querySelector('.left-arrow');
     const rightArr = document.querySelector('.right-arrow');
     if (leftArr) leftArr.disabled = (currentPage === 1);
     if (rightArr) rightArr.disabled = (currentPage === totalPages);
 }
 
-// 2. NAVIGATION (Updated with Sound)
+// 2. NAVIGATION
 function changePage(delta) {
     const newPage = currentPage + delta;
     if (newPage >= 1 && newPage <= totalPages) {
-        // PLAY SOUND
-        // We use try/catch because browsers block audio if user hasn't interacted yet
         try {
             const audio = new Audio('assets/page-flip-4.mp3');
-            audio.volume = 0.5; // 50% volume
+            audio.volume = 0.5;
             audio.play().catch(e => console.log("Audio waiting for interaction"));
-        } catch (err) {
-            console.log("Audio error", err);
-        }
+        } catch (err) { console.log("Audio error", err); }
 
         currentPage = newPage;
         updateViewer();
@@ -112,7 +112,22 @@ function setActive(element) {
     element.classList.add('active');
 }
 
-// 4. EDITION SELECTOR
+// 4. NEW: INFO MODALS LOGIC (About, Contact, etc.)
+function openInfoModal(modalId) {
+    // Show the modal
+    document.getElementById(modalId).style.display = "block";
+    // Close the sidebar automatically
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar.style.width === "250px") {
+        sidebar.style.width = "0";
+    }
+}
+
+function closeInfoModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+// 5. EDITION SELECTOR
 function populateDateDropdown() {
     const select = document.getElementById('dateSelect');
     select.innerHTML = "";
@@ -133,7 +148,7 @@ function loadSelectedEdition() {
     closeEditionSelector();
 }
 
-// 5. ADVANCED CLIPPER (WITH BRANDING & DYNAMIC DATE)
+// 6. CLIPPER LOGIC
 function toggleClipper() {
     const modal = document.getElementById('clipperOverlay');
     const pageImg = document.getElementById('pageImage');
@@ -175,11 +190,9 @@ function getBrandedCanvas() {
     finalCanvas.height = finalHeight;
     const ctx = finalCanvas.getContext('2d');
 
-    // Background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, finalWidth, finalHeight);
 
-    // Header Logo
     const logoImg = document.querySelector('.logo-area img'); 
     if (logoImg) {
         const logoH = Math.round(60 * scale); 
@@ -189,7 +202,6 @@ function getBrandedCanvas() {
         ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
     }
 
-    // Header Date
     const today = new Date();
     const dateStr = today.getDate().toString().padStart(2, '0') + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getFullYear();
     ctx.textAlign = "left";
@@ -197,7 +209,6 @@ function getBrandedCanvas() {
     ctx.font = `bold ${Math.round(20 * scale)}px Arial`;
     ctx.fillText(dateStr, 20 * scale, headerHeight / 2 + (8 * scale));
 
-    // Separator
     ctx.beginPath();
     ctx.moveTo(20 * scale, headerHeight - 2);
     ctx.lineTo(finalWidth - (20 * scale), headerHeight - 2);
@@ -205,11 +216,9 @@ function getBrandedCanvas() {
     ctx.lineWidth = 2 * scale;
     ctx.stroke();
 
-    // Image
     const cropX = (finalWidth - cropCanvas.width) / 2;
     ctx.drawImage(cropCanvas, cropX, headerHeight);
 
-    // Footer
     ctx.fillStyle = "#008000"; 
     ctx.fillRect(0, finalHeight - footerHeight, finalWidth, footerHeight);
 
@@ -251,7 +260,7 @@ function downloadClip() {
     });
 }
 
-// 6. FOOTER LOGIC
+// 7. FOOTER LOGIC
 function toggleFooter() {
     const footer = document.getElementById("sliding-footer");
     footer.classList.toggle("active");

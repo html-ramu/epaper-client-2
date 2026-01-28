@@ -40,11 +40,10 @@
 
     <div class="sidebar" id="sidebar">
         <div class="close-btn" onclick="toggleMenu()">&times;</div>
-        <a href="#">Home</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
-        <a href="#">Advertise</a>
-        <a href="#">Privacy Policy</a>
+        <a href="#" onclick="openInfoModal('aboutModal')">ℹ️ About Us</a>
+        <a href="#" onclick="openInfoModal('contactModal')">📞 Contact Us</a>
+        <a href="#" onclick="openInfoModal('advertiseModal')">📢 Advertise</a>
+        <a href="#" onclick="openInfoModal('privacyModal')">🔒 Privacy Policy</a>
     </div>
 
     <div class="category-bar">
@@ -95,6 +94,68 @@
         </div>
     </div>
 
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeInfoModal('aboutModal')">&times;</span>
+            <h3>ℹ️ About Us</h3>
+            <div class="info-text">
+                <p>epaperb10vartha.in is a Telugu online e-paper dedicated to delivering fast, reliable news to readers in their own language.</p>
+                <p>It focuses on local news from towns and villages across Andhra Pradesh and Telangana, ensuring regional issues and voices are highlighted.</p>
+                <p>At the same time, it covers major national developments from across India, helping readers stay informed about politics, economy, technology, and society.</p>
+                <p>International news is also included so Telugu readers can easily follow important global events without language barriers.</p>
+                <p>The platform aims to provide clear, unbiased coverage with a special emphasis on accuracy and credibility.</p>
+                <p>Designed as a digital e-paper, it offers a newspaper-like reading experience that works smoothly on mobiles, tablets, and desktops.</p>
+                <p>The vision of epaperb10vartha.in is to make quality journalism accessible to every Telugu speaker, wherever they live.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeInfoModal('contactModal')">&times;</span>
+            <h3>📞 Contact Us</h3>
+            <div class="info-text">
+                <p>For any news, feedback, related to B10 Vartha Telugu e‑paper, please contact us using the details below.</p>
+                <p><strong>Email:</strong> sekharbyiram@gmail.com<br>
+                <strong>Phone / WhatsApp:</strong> 9000607207</p>
+                <p>We welcome story tips, corrections, partnership proposals, and general questions from our readers.</p>
+                <p>Your suggestions help us improve our coverage and serve the Telugu community better.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="advertiseModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeInfoModal('advertiseModal')">&times;</span>
+            <h3>📢 Advertise</h3>
+            <div class="info-text">
+                <p>For advertising enquiries related to B10 Vartha Telugu e‑paper, please contact us using the details below.</p>
+                <p><strong>Email:</strong> sekharbyiram@gmail.com<br>
+                <strong>Phone / WhatsApp:</strong> 9000607207</p>
+                <p>We welcome story tips, corrections, partnership proposals, and general questions from our readers.</p>
+                <p>Your suggestions help us improve our coverage and serve the Telugu community better.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeInfoModal('privacyModal')">&times;</span>
+            <h3>🔒 Privacy Policy</h3>
+            <div class="info-text">
+                [cite_start]<p>B10 Vartha respects your privacy and is committed to protecting it. [cite: 26]</p>
+                [cite_start]<p>This website is designed only to display Telugu news and related content. [cite: 27]</p>
+                [cite_start]<p>We do not require users to create an account, log in, or share any personal information to read our e‑paper. [cite: 28]</p>
+                [cite_start]<p>We do not intentionally collect, store, or sell any personal data such as names, email addresses, phone numbers, or location details. [cite: 29]</p>
+                [cite_start]<p>Any information you choose to share with us voluntarily (for example, when contacting us by email or phone) will be used only to respond to your enquiry and will not be shared with third parties without your consent, except if required by law. [cite: 30]</p>
+                [cite_start]<p>Our website may be hosted on third‑party servers or may use standard web technologies (such as basic server logs) for security and performance, but we do not use this information to identify individual users. [cite: 31]</p>
+                [cite_start]<p>If we ever change our data practices in the future, we will update this Privacy Policy and clearly inform users on this page. [cite: 32]</p>
+                [cite_start]<p>By using this website, you agree to this Privacy Policy. [cite: 33]</p>
+                [cite_start]<p>If you have any questions, you can contact us at sekharbyiram@gmail.com or 9000607207. [cite: 34]</p>
+            </div>
+        </div>
+    </div>
+
     <div id="clipperOverlay" class="clipper-overlay">
         <div class="clipper-header">
             <div class="header-spacer"></div> <img src="assets/logo.png" alt="B10 Vartha" class="clipper-logo">
@@ -131,6 +192,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
 </body>
 </html>

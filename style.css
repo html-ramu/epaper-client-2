@@ -1,7 +1,5 @@
-/* GLOBAL RESET: This ensures padding doesn't break the layout */
-* {
-    box-sizing: border-box;
-}
+/* GLOBAL RESET */
+* { box-sizing: border-box; }
 
 :root {
     --primary-blue: #2f96f0;
@@ -36,7 +34,7 @@ body {
 }
 
 .top-bar-2 {
-    top: 30px; /* Matches height of bar 1 */
+    top: 30px; 
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -45,11 +43,7 @@ body {
 }
 
 /* Social Icons */
-.social-icons a {
-    margin-left: 10px;
-    font-size: 18px;
-    text-decoration: none;
-}
+.social-icons a { margin-left: 10px; font-size: 18px; text-decoration: none; }
 
 /* Logo & Live */
 .logo-area img { height: 40px; cursor: pointer; }
@@ -83,19 +77,13 @@ body {
     background: white; display: flex; align-items: center;
     border-bottom: 1px solid #ccc; height: 45px;
 }
-.fixed-home {
-    padding: 10px 15px; border-right: 1px solid #eee; cursor: pointer;
-}
-.cat-scroll-area {
-    display: flex; overflow-x: auto; white-space: nowrap; scrollbar-width: none;
-}
+.fixed-home { padding: 10px 15px; border-right: 1px solid #eee; cursor: pointer; }
+.cat-scroll-area { display: flex; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
 .cat-item {
     display: inline-block; padding: 8px 15px; text-decoration: none;
     color: black; border-radius: 4px; margin: 2px; font-size: 14px;
 }
-.cat-item.active {
-    background-color: var(--primary-blue); color: white;
-}
+.cat-item.active { background-color: var(--primary-blue); color: white; }
 
 /* Marquee */
 .ad-marquee {
@@ -119,39 +107,42 @@ body {
 .pdf-btn { color: red; font-weight: bold; text-decoration: none; font-size: 14px; }
 .page-indicator { font-weight: bold; font-size: 14px; }
 
-/* Viewer - UPDATED FOR MOBILE PADDING */
+/* Viewer */
 .viewer-container {
-    min-height: 80vh; 
-    text-align: center; 
-    padding-bottom: 50px; 
-    position: relative;
-    /* Add padding so it doesn't touch the edges */
-    padding-left: 4px;
-    padding-right: 4px;
+    min-height: 80vh; text-align: center; padding-bottom: 50px; position: relative;
+    padding-left: 4px; padding-right: 4px;
 }
 .viewer-container img {
-    width: 100%; 
-    height: auto; 
-    display: block;
-    /* Optional: Add a subtle shadow to separate paper from background */
+    width: 100%; height: auto; display: block;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 #loadingMsg { padding: 50px; color: #666; }
 
-/* Modal (Edition Selector) */
+/* Modal (Generic) */
 .modal {
     display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
     background-color: rgba(0,0,0,0.8);
 }
 .modal-content {
-    background-color: #fefefe; margin: 20% auto; padding: 20px; width: 80%;
+    background-color: #fefefe; margin: 15% auto; padding: 20px; width: 85%;
+    max-width: 600px; /* Readability on desktop */
+    border-radius: 5px;
+    max-height: 80vh; overflow-y: auto; /* Scroll if text is long */
+}
+.close-modal {
+    color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;
 }
 
+/* NEW: Styles for Text Pages (About, Privacy, etc.) */
+.info-text p {
+    line-height: 1.6;
+    margin-bottom: 12px;
+    color: #444;
+    font-size: 15px;
+}
+.info-text strong { color: #000; }
 
-/* =========================================
-   NEW SLIDING FOOTER STYLES
-   ========================================= */
-
+/* Footer */
 #sliding-footer {
     position: fixed; left: 0; width: 100%; bottom: 0;
     transform: translateY(100%); 
@@ -172,118 +163,47 @@ body {
     font-family: sans-serif; color: #f0f0f0;
 }
 
-
-/* =========================================
-   ADVANCED CLIPPER STYLES
-   ========================================= */
-
+/* Clipper */
 .clipper-overlay {
-    display: none;
-    position: fixed;
-    z-index: 3000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #000;
-    flex-direction: column;
+    display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: #000; flex-direction: column;
 }
-
 .clipper-header {
-    background: white;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
-    border-bottom: 1px solid #ccc;
-    flex-shrink: 0;
+    background: white; height: 50px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 15px; border-bottom: 1px solid #ccc; flex-shrink: 0;
 }
-
 .clipper-logo { height: 35px; }
 .header-spacer { width: 30px; } 
 .clipper-close {
-    background: none;
-    border: none;
-    font-size: 30px;
-    cursor: pointer;
-    color: #333;
-    line-height: 1;
+    background: none; border: none; font-size: 30px; cursor: pointer; color: #333; line-height: 1;
 }
-
 .clipper-body {
-    flex-grow: 1;
-    overflow: hidden;
-    position: relative;
-    background-color: #333; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-grow: 1; overflow: hidden; position: relative; background-color: #333; 
+    display: flex; justify-content: center; align-items: center;
 }
-
 .clipper-controls {
-    padding: 15px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    background: #111;
+    padding: 15px; display: flex; justify-content: center; gap: 20px; background: #111;
 }
-
 .action-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 20px;
-    font-size: 16px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding: 10px 20px; border: none; border-radius: 20px; font-size: 16px; cursor: pointer;
+    color: white; display: flex; align-items: center; gap: 8px;
 }
 .share-btn { background-color: #25d366; }
 .download-btn { background-color: #2f96f0; }
-
 .clipper-footer-text {
-    background: #000;
-    color: #888;
-    text-align: center;
-    font-size: 10px;
-    padding: 5px 10px 10px 10px;
-    font-family: sans-serif;
-    border-top: 1px solid #222;
+    background: #000; color: #888; text-align: center; font-size: 10px;
+    padding: 5px 10px 10px 10px; font-family: sans-serif; border-top: 1px solid #222;
 }
 
-/* =========================================
-   SIDE NAVIGATION ARROWS
-   ========================================= */
+/* Side Arrows */
 .nav-arrow {
-    position: fixed; /* Stays in place while scrolling */
-    top: 50%; /* Center vertically */
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.4); /* See-through dark bg */
-    color: white;
-    border: none;
-    padding: 15px 10px;
-    font-size: 24px;
-    cursor: pointer;
-    z-index: 950; /* Above image, below header/clipper */
-    border-radius: 5px;
-    transition: all 0.3s ease;
+    position: fixed; top: 50%; transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.4); color: white;
+    border: none; padding: 15px 10px; font-size: 24px; cursor: pointer;
+    z-index: 950; border-radius: 5px; transition: all 0.3s ease;
 }
-
-.nav-arrow:hover {
-    background-color: rgba(0, 0, 0, 0.8); /* Darker on touch/hover */
-}
-
-/* Position them on edges */
+.nav-arrow:hover { background-color: rgba(0, 0, 0, 0.8); }
 .left-arrow { left: 5px; }
 .right-arrow { right: 5px; }
-
-/* Hide if disabled (e.g. on Page 1) */
-.nav-arrow:disabled {
-    opacity: 0; 
-    pointer-events: none;
-}
-
-/* Hide arrows on Clipper Overlay */
+.nav-arrow:disabled { opacity: 0; pointer-events: none; }
 .clipper-overlay .nav-arrow { display: none; }
