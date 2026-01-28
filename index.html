@@ -75,7 +75,15 @@
     </div>
 
     <div class="viewer-container" id="viewerContainer">
+        <button class="nav-arrow left-arrow" onclick="changePage(-1)">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
         <img id="pageImage" src="" alt="News Page" loading="lazy">
+        
+        <button class="nav-arrow right-arrow" onclick="changePage(1)">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
     </div>
 
     <div id="editionModal" class="modal">
@@ -110,6 +118,7 @@
             Read full NEWS at epaperb10vartha.in | Copyright © 2026 B10Vartha | Built by saas.ramu
         </div>
     </div>
+
     <div id="sliding-footer">
         <div id="footer-btn" onclick="toggleFooter()">⏏</div>
 
@@ -122,6 +131,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=5"></script>
 </body>
 </html>

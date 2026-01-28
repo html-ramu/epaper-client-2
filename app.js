@@ -1,7 +1,7 @@
 // CONFIGURATION
 const REPO_URL = "https://sekharbyiram-max.github.io/b10-epaper"; 
 
-// MOCK DATA (In a real app, you might fetch a manifest.json)
+// MOCK DATA 
 const editions = {
     "28-01-2026": { pages: 5, pdf: "full.pdf" },
     // ROBOT_ENTRY_POINT
@@ -64,14 +64,32 @@ function updateViewer() {
     imgElement.onload = function() { imgElement.style.opacity = "1"; };
     imgElement.onerror = function() { imgElement.alt = "Page not found or uploading..."; };
 
+    // BUTTON STATES (Bottom Bar)
     document.getElementById('btnPrev').disabled = (currentPage === 1);
     document.getElementById('btnNext').disabled = (currentPage === totalPages);
+
+    // BUTTON STATES (Side Arrows)
+    // We use querySelector because they are classes
+    const leftArr = document.querySelector('.left-arrow');
+    const rightArr = document.querySelector('.right-arrow');
+    if (leftArr) leftArr.disabled = (currentPage === 1);
+    if (rightArr) rightArr.disabled = (currentPage === totalPages);
 }
 
-// 2. NAVIGATION
+// 2. NAVIGATION (Updated with Sound)
 function changePage(delta) {
     const newPage = currentPage + delta;
     if (newPage >= 1 && newPage <= totalPages) {
+        // PLAY SOUND
+        // We use try/catch because browsers block audio if user hasn't interacted yet
+        try {
+            const audio = new Audio('assets/page-flip-4.mp3');
+            audio.volume = 0.5; // 50% volume
+            audio.play().catch(e => console.log("Audio waiting for interaction"));
+        } catch (err) {
+            console.log("Audio error", err);
+        }
+
         currentPage = newPage;
         updateViewer();
         window.scrollTo(0, 120); 
@@ -115,7 +133,7 @@ function loadSelectedEdition() {
     closeEditionSelector();
 }
 
-// 5. ADVANCED CLIPPER (WITH BRANDING)
+// 5. ADVANCED CLIPPER (WITH BRANDING & DYNAMIC DATE)
 function toggleClipper() {
     const modal = document.getElementById('clipperOverlay');
     const pageImg = document.getElementById('pageImage');
@@ -131,37 +149,25 @@ function toggleClipper() {
         setTimeout(() => {
             if (cropper) cropper.destroy();
             cropper = new Cropper(clipImg, {
-                viewMode: 1, 
-                dragMode: 'move', 
-                autoCropArea: 0.5, 
-                guides: true, 
-                background: false, 
-                movable: true,
-                zoomable: true,
-                cropBoxMovable: true,
-                cropBoxResizable: true,
+                viewMode: 1, dragMode: 'move', autoCropArea: 0.5, 
+                guides: true, background: false, movable: true,
+                zoomable: true, cropBoxMovable: true, cropBoxResizable: true,
             });
         }, 100);
     }
 }
 
-// --- NEW HELPER: Branding with Date & Green Footer ---
 function getBrandedCanvas() {
     if (!cropper) return null;
-
     const cropCanvas = cropper.getCroppedCanvas();
     if (!cropCanvas) return null;
 
-    // SCALING LOGIC
     const minWidth = 600; 
     const finalWidth = Math.max(cropCanvas.width, minWidth);
-    
-    // Scale Factor (Base reference 800px)
     const scale = finalWidth / 800;
 
-    // Dynamic Heights
     const headerHeight = Math.round(100 * scale); 
-    const footerHeight = Math.round(70 * scale); // Taller for big text
+    const footerHeight = Math.round(70 * scale); 
     const finalHeight = cropCanvas.height + headerHeight + footerHeight;
 
     const finalCanvas = document.createElement('canvas');
@@ -169,11 +175,11 @@ function getBrandedCanvas() {
     finalCanvas.height = finalHeight;
     const ctx = finalCanvas.getContext('2d');
 
-    // 1. White Background (Overall)
+    // Background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, finalWidth, finalHeight);
 
-    // 2. HEADER: Dynamic Logo (Center)
+    // Header Logo
     const logoImg = document.querySelector('.logo-area img'); 
     if (logoImg) {
         const logoH = Math.round(60 * scale); 
@@ -183,17 +189,15 @@ function getBrandedCanvas() {
         ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
     }
 
-    // 3. HEADER: Today's Date (Left)
+    // Header Date
     const today = new Date();
     const dateStr = today.getDate().toString().padStart(2, '0') + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getFullYear();
-    
     ctx.textAlign = "left";
     ctx.fillStyle = "#333333";
     ctx.font = `bold ${Math.round(20 * scale)}px Arial`;
-    // Position: 20px padding left, vertically centered in header
     ctx.fillText(dateStr, 20 * scale, headerHeight / 2 + (8 * scale));
 
-    // 4. Separator Line
+    // Separator
     ctx.beginPath();
     ctx.moveTo(20 * scale, headerHeight - 2);
     ctx.lineTo(finalWidth - (20 * scale), headerHeight - 2);
@@ -201,40 +205,31 @@ function getBrandedCanvas() {
     ctx.lineWidth = 2 * scale;
     ctx.stroke();
 
-    // 5. Draw Cropped Image
+    // Image
     const cropX = (finalWidth - cropCanvas.width) / 2;
     ctx.drawImage(cropCanvas, cropX, headerHeight);
 
-    // 6. FOOTER BACKGROUND (Green)
-    ctx.fillStyle = "#008000"; // B10 Green
+    // Footer
+    ctx.fillStyle = "#008000"; 
     ctx.fillRect(0, finalHeight - footerHeight, finalWidth, footerHeight);
 
-    // 7. FOOTER TEXT
     ctx.textAlign = "center";
-    ctx.fillStyle = "#ffffff"; // White Text
-    const fontMain = Math.round(24 * scale); // Bigger Font
+    ctx.fillStyle = "#ffffff"; 
+    const fontMain = Math.round(24 * scale); 
     ctx.font = `bold ${fontMain}px Arial`;
-    // Centered in the green box
     ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - (footerHeight / 2) + (8 * scale));
 
     return finalCanvas;
 }
 
-// Updated Share Function
 async function shareClip() {
     const brandedCanvas = getBrandedCanvas();
     if (!brandedCanvas) return;
-
     brandedCanvas.toBlob(async (blob) => {
         if (navigator.share && navigator.canShare) {
             const file = new File([blob], "b10-news-clip.png", { type: "image/png" });
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: 'B10 Vartha News',
-                    text: 'Read full NEWS at epaperb10vartha.in'
-                });
-            } catch (err) { console.log("Error sharing:", err); }
+            try { await navigator.share({ files: [file], title: 'B10 Vartha News', text: 'Read full NEWS at epaperb10vartha.in' }); } 
+            catch (err) { console.log("Error sharing:", err); }
         } else {
             alert("Sharing is best on Mobile. On Desktop, use 'Download'.");
             downloadClip();
@@ -242,11 +237,9 @@ async function shareClip() {
     });
 }
 
-// Updated Download Function
 function downloadClip() {
     const brandedCanvas = getBrandedCanvas();
     if (!brandedCanvas) return;
-    
     brandedCanvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
