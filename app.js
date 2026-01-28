@@ -145,7 +145,7 @@ function toggleClipper() {
     }
 }
 
-// --- NEW HELPER: Creates the branded image WITH SCALING ---
+// --- NEW HELPER: Branding with Date & Green Footer ---
 function getBrandedCanvas() {
     if (!cropper) return null;
 
@@ -153,17 +153,15 @@ function getBrandedCanvas() {
     if (!cropCanvas) return null;
 
     // SCALING LOGIC
-    // We base sizes on the image width. 
-    // If width is 1000px, scale is 1. If width is 2000px, scale is 2.
     const minWidth = 600; 
     const finalWidth = Math.max(cropCanvas.width, minWidth);
     
-    // Calculate Scale Factor (Base reference is 800px width)
+    // Scale Factor (Base reference 800px)
     const scale = finalWidth / 800;
 
-    // Dynamic Heights & Fonts based on scale
-    const headerHeight = Math.round(100 * scale); // Was fixed 80
-    const footerHeight = Math.round(60 * scale);  // Was fixed 50
+    // Dynamic Heights
+    const headerHeight = Math.round(100 * scale); 
+    const footerHeight = Math.round(70 * scale); // Taller for big text
     const finalHeight = cropCanvas.height + headerHeight + footerHeight;
 
     const finalCanvas = document.createElement('canvas');
@@ -171,21 +169,31 @@ function getBrandedCanvas() {
     finalCanvas.height = finalHeight;
     const ctx = finalCanvas.getContext('2d');
 
-    // White Background
+    // 1. White Background (Overall)
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, finalWidth, finalHeight);
 
-    // Dynamic Logo
+    // 2. HEADER: Dynamic Logo (Center)
     const logoImg = document.querySelector('.logo-area img'); 
     if (logoImg) {
-        const logoH = Math.round(60 * scale); // Logo grows with image
+        const logoH = Math.round(60 * scale); 
         const logoW = (logoImg.naturalWidth / logoImg.naturalHeight) * logoH;
         const logoX = (finalWidth - logoW) / 2;
         const logoY = (headerHeight - logoH) / 2;
         ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
     }
 
-    // Separator Line
+    // 3. HEADER: Today's Date (Left)
+    const today = new Date();
+    const dateStr = today.getDate().toString().padStart(2, '0') + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getFullYear();
+    
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#333333";
+    ctx.font = `bold ${Math.round(20 * scale)}px Arial`;
+    // Position: 20px padding left, vertically centered in header
+    ctx.fillText(dateStr, 20 * scale, headerHeight / 2 + (8 * scale));
+
+    // 4. Separator Line
     ctx.beginPath();
     ctx.moveTo(20 * scale, headerHeight - 2);
     ctx.lineTo(finalWidth - (20 * scale), headerHeight - 2);
@@ -193,24 +201,21 @@ function getBrandedCanvas() {
     ctx.lineWidth = 2 * scale;
     ctx.stroke();
 
-    // Draw Cropped Image
+    // 5. Draw Cropped Image
     const cropX = (finalWidth - cropCanvas.width) / 2;
     ctx.drawImage(cropCanvas, cropX, headerHeight);
 
-    // Dynamic Footer Text
+    // 6. FOOTER BACKGROUND (Green)
+    ctx.fillStyle = "#008000"; // B10 Green
+    ctx.fillRect(0, finalHeight - footerHeight, finalWidth, footerHeight);
+
+    // 7. FOOTER TEXT
     ctx.textAlign = "center";
-    
-    // Main Footer Text (Big)
-    ctx.fillStyle = "#333333";
-    const fontMain = Math.round(18 * scale); // Font grows with image
+    ctx.fillStyle = "#ffffff"; // White Text
+    const fontMain = Math.round(24 * scale); // Bigger Font
     ctx.font = `bold ${fontMain}px Arial`;
-    ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - (25 * scale));
-    
-    // Copyright Text (Small)
-    ctx.fillStyle = "#888888";
-    const fontSub = Math.round(12 * scale);
-    ctx.font = `${fontSub}px Arial`;
-    ctx.fillText("Copyright © 2026 B10Vartha", finalWidth / 2, finalHeight - (8 * scale));
+    // Centered in the green box
+    ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - (footerHeight / 2) + (8 * scale));
 
     return finalCanvas;
 }
