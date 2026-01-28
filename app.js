@@ -145,65 +145,72 @@ function toggleClipper() {
     }
 }
 
-// --- NEW HELPER: Creates the branded image ---
+// --- NEW HELPER: Creates the branded image WITH SCALING ---
 function getBrandedCanvas() {
     if (!cropper) return null;
 
-    // 1. Get the raw cropped image
     const cropCanvas = cropper.getCroppedCanvas();
     if (!cropCanvas) return null;
 
-    // 2. Settings for the final image
-    const headerHeight = 80;
-    const footerHeight = 50;
-    const minWidth = 600; // Minimum width to ensure logo/text fits nicely
-
-    // Calculate dimensions
-    // We make sure the canvas is at least 'minWidth' wide
+    // SCALING LOGIC
+    // We base sizes on the image width. 
+    // If width is 1000px, scale is 1. If width is 2000px, scale is 2.
+    const minWidth = 600; 
     const finalWidth = Math.max(cropCanvas.width, minWidth);
+    
+    // Calculate Scale Factor (Base reference is 800px width)
+    const scale = finalWidth / 800;
+
+    // Dynamic Heights & Fonts based on scale
+    const headerHeight = Math.round(100 * scale); // Was fixed 80
+    const footerHeight = Math.round(60 * scale);  // Was fixed 50
     const finalHeight = cropCanvas.height + headerHeight + footerHeight;
 
-    // 3. Create the new canvas
     const finalCanvas = document.createElement('canvas');
     finalCanvas.width = finalWidth;
     finalCanvas.height = finalHeight;
     const ctx = finalCanvas.getContext('2d');
 
-    // 4. Fill White Background
+    // White Background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, finalWidth, finalHeight);
 
-    // 5. Draw Top Logo (Centered)
-    // We grab the existing logo from your page to draw it
+    // Dynamic Logo
     const logoImg = document.querySelector('.logo-area img'); 
     if (logoImg) {
-        // Maintain aspect ratio of logo
-        const logoH = 50; 
+        const logoH = Math.round(60 * scale); // Logo grows with image
         const logoW = (logoImg.naturalWidth / logoImg.naturalHeight) * logoH;
         const logoX = (finalWidth - logoW) / 2;
-        ctx.drawImage(logoImg, logoX, 15, logoW, logoH); // 15px padding top
+        const logoY = (headerHeight - logoH) / 2;
+        ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
     }
 
-    // 6. Draw Separator Line (Optional)
+    // Separator Line
     ctx.beginPath();
-    ctx.moveTo(20, headerHeight - 5);
-    ctx.lineTo(finalWidth - 20, headerHeight - 5);
+    ctx.moveTo(20 * scale, headerHeight - 2);
+    ctx.lineTo(finalWidth - (20 * scale), headerHeight - 2);
     ctx.strokeStyle = "#eeeeee";
+    ctx.lineWidth = 2 * scale;
     ctx.stroke();
 
-    // 7. Draw the Cropped Image (Centered horizontally)
+    // Draw Cropped Image
     const cropX = (finalWidth - cropCanvas.width) / 2;
     ctx.drawImage(cropCanvas, cropX, headerHeight);
 
-    // 8. Draw Footer Text
-    ctx.fillStyle = "#333333"; // Text Color
-    ctx.font = "14px Arial";
+    // Dynamic Footer Text
     ctx.textAlign = "center";
-    ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - 25);
     
-    ctx.fillStyle = "#888888"; // Lighter Copyright
-    ctx.font = "10px Arial";
-    ctx.fillText("Copyright © 2026 B10Vartha", finalWidth / 2, finalHeight - 10);
+    // Main Footer Text (Big)
+    ctx.fillStyle = "#333333";
+    const fontMain = Math.round(18 * scale); // Font grows with image
+    ctx.font = `bold ${fontMain}px Arial`;
+    ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - (25 * scale));
+    
+    // Copyright Text (Small)
+    ctx.fillStyle = "#888888";
+    const fontSub = Math.round(12 * scale);
+    ctx.font = `${fontSub}px Arial`;
+    ctx.fillText("Copyright © 2026 B10Vartha", finalWidth / 2, finalHeight - (8 * scale));
 
     return finalCanvas;
 }
@@ -225,7 +232,7 @@ async function shareClip() {
             } catch (err) { console.log("Error sharing:", err); }
         } else {
             alert("Sharing is best on Mobile. On Desktop, use 'Download'.");
-            downloadClip(); // Fallback
+            downloadClip();
         }
     });
 }
