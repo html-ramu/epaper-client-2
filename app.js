@@ -5,6 +5,8 @@ const REPO_URL = "https://sekharbyiram-max.github.io/b10-epaper";
 const editions = {
     "28-01-2026": { pages: 5, pdf: "full.pdf" },
     // ROBOT_ENTRY_POINT
+    "29-01-2026": { pages: 5 },
+
     "27-01-2026": { pages: 8, pdf: "full.pdf" },
     "26-01-2026": { pages: 6, pdf: "full.pdf" },
     "25-01-2026": { pages: 8, pdf: "full.pdf" }
