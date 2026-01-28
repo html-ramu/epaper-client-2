@@ -4,6 +4,7 @@ const REPO_URL = "https://sekharbyiram-max.github.io/b10-epaper";
 // MOCK DATA (In a real app, you might fetch a manifest.json)
 // Format: "DD-MM-YYYY": { pages: total_pages, pdf: "filename.pdf" }
 const editions = {
+    "28-01-2026": { pages: 5, pdf: "full.pdf" },
     // ROBOT_ENTRY_POINT
     "27-01-2026": { pages: 8, pdf: "full.pdf" },
     "26-01-2026": { pages: 6, pdf: "full.pdf" },
