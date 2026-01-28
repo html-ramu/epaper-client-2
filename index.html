@@ -7,6 +7,9 @@
     <link rel="icon" type="image/png" href="assets/favicon.png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -86,17 +89,27 @@
 
     <div id="clipperOverlay" class="clipper-overlay">
         <div class="clipper-header">
-            <img src="assets/logo.png" alt="B10" style="height:30px;">
-            <button onclick="toggleClipper()" style="float:right; background:none; border:none; color:black; font-size:20px;">&times;</button>
+            <div class="header-spacer"></div> <img src="assets/logo.png" alt="B10 Vartha" class="clipper-logo">
+            <button onclick="toggleClipper()" class="clipper-close">&times;</button>
         </div>
-        <div class="clipper-body">
-            <p style="color:red; text-align:center; padding: 20px;">Use device screenshot for best quality, or tap 'Share' below.</p>
-            <img id="clipperImage" src="" style="width:100%;">
-        </div>
-        <div class="clipper-footer">
-            </div>
-    </div>
 
+        <div class="clipper-body">
+            <img id="clipperImage" src="" style="max-width: 100%; display: block;">
+        </div>
+
+        <div class="clipper-controls">
+            <button class="action-btn share-btn" onclick="shareClip()">
+                <i class="fa-solid fa-share-nodes"></i> Share / WhatsApp
+            </button>
+            <button class="action-btn download-btn" onclick="downloadClip()">
+                <i class="fa-solid fa-download"></i> Download
+            </button>
+        </div>
+        
+        <div class="clipper-footer-text">
+            Read full NEWS at epaperb10vartha.in | Copyright © 2026 B10Vartha | Built by saas.ramu
+        </div>
+    </div>
     <div id="sliding-footer">
         <div id="footer-btn" onclick="toggleFooter()">⏏</div>
 
@@ -106,6 +119,8 @@
             <p>Built by saas.ramu</p>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
     <script src="app.js"></script>
 </body>

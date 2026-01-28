@@ -15,6 +15,7 @@ const editions = {
 let currentDateStr = "27-01-2026"; // Default start
 let currentPage = 1;
 let totalPages = 1;
+let cropper = null; // Store the cropper instance
 
 // INITIALIZATION
 window.onload = function() {
@@ -137,23 +138,86 @@ function loadSelectedEdition() {
     closeEditionSelector();
 }
 
-// 5. CLIPPER (MVP)
+// 5. ADVANCED CLIPPER LOGIC (NEW)
 function toggleClipper() {
     const modal = document.getElementById('clipperOverlay');
+    const pageImg = document.getElementById('pageImage');
     const clipImg = document.getElementById('clipperImage');
     
-    if (modal.style.display === "block") {
+    if (modal.style.display === "flex") {
+        // CLOSE
         modal.style.display = "none";
+        if (cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
     } else {
-        modal.style.display = "block";
-        clipImg.src = document.getElementById('pageImage').src;
+        // OPEN
+        modal.style.display = "flex"; // Must be flex for centering
+        clipImg.src = pageImg.src;
+
+        // Initialize Cropper after a tiny delay
+        setTimeout(() => {
+            if (cropper) cropper.destroy();
+            
+            cropper = new Cropper(clipImg, {
+                viewMode: 1, // Restrict crop box to image size
+                dragMode: 'move', // Allow dragging the image
+                autoCropArea: 0.5, // Start with 50% selection box
+                guides: true, // Show dashed lines
+                background: false, // Hide grid background
+                movable: true,
+                zoomable: true,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+            });
+        }, 100);
     }
 }
 
-// 6. FOOTER LOGIC (Final Version)
+// Share Function (WhatsApp, FB, System)
+async function shareClip() {
+    if (!cropper) return;
+
+    // 1. Convert crop to Image Blob
+    cropper.getCroppedCanvas().toBlob(async (blob) => {
+        // 2. Check if device supports native sharing (Mobile)
+        if (navigator.share && navigator.canShare) {
+            const file = new File([blob], "b10-news-clip.png", { type: "image/png" });
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: 'B10 Vartha News',
+                    text: 'Read full NEWS at epaperb10vartha.in'
+                });
+            } catch (err) {
+                console.log("Error sharing:", err);
+            }
+        } else {
+            // Fallback for Desktop
+            alert("Sharing is best on Mobile. On Desktop, use 'Download'.");
+            downloadClip();
+        }
+    });
+}
+
+// Download Function
+function downloadClip() {
+    if (!cropper) return;
+    
+    cropper.getCroppedCanvas().toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `B10-News-Clip-${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+}
+
+// 6. FOOTER LOGIC
 function toggleFooter() {
     const footer = document.getElementById("sliding-footer");
-    // Simply switches the class on/off. 
-    // This allows the CSS to handle the slide animation.
     footer.classList.toggle("active");
 }
