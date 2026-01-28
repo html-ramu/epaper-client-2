@@ -169,3 +169,16 @@ function toggleFooter() {
         icon.classList.add('fa-caret-up');
     }
 }
+function toggleFooter() {
+    const footer = document.getElementById("sliding-footer");
+    const btn = document.getElementById("footer-btn");
+    
+    // Check if footer is currently open
+    if (footer.classList.contains("active")) {
+        footer.classList.remove("active"); // Hide it
+        btn.innerHTML = "▲"; // Arrow up
+    } else {
+        footer.classList.add("active"); // Show it
+        btn.innerHTML = "▼"; // Arrow down
+    }
+}

@@ -144,3 +144,44 @@ body {
 }
 .clipper-header { background: white; padding: 10px; }
 .clipper-footer { background: #eee; padding: 10px; text-align: center; font-size: 10px; position: fixed; bottom:0; width: 100%;}
+/* Sliding Footer Styles */
+#sliding-footer {
+    position: fixed;
+    bottom: -200px; /* Hidden below screen */
+    left: 0;
+    width: 100%;
+    background-color: #222; /* Dark background */
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    transition: bottom 0.4s ease-in-out; /* Smooth slide */
+    z-index: 2000;
+    border-top: 3px solid #d32f2f;
+}
+
+#sliding-footer.active {
+    bottom: 0; /* Slide up to show */
+}
+
+#sliding-footer p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+#footer-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: #d32f2f; /* Red button */
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 2001;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    user-select: none;
+}
