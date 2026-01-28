@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
+    <title>B10 Vartha ePaper</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="top-bar-1">
+        <div class="date-display" id="headerDate">DD-MM-YYYY</div>
+        <div class="social-icons">
+            <a href="https://www.youtube.com/@B10newsAp/videos" target="_blank"><i class="fa-brands fa-youtube" style="color: #ff0000;"></i></a>
+            <a href="https://www.facebook.com/profile.php?id=100086213201003" target="_blank"><i class="fa-brands fa-facebook" style="color: #1877f2;"></i></a>
+            <a href="https://play.google.com/store/search?q=whatsapp&c=apps" target="_blank"><i class="fa-brands fa-whatsapp" style="color: #25d366;"></i></a>
+        </div>
+    </div>
+
+    <div class="top-bar-2">
+        <div class="logo-area">
+            <img src="assets/logo.png" alt="B10 Vartha" id="logoClick">
+        </div>
+        <div class="live-area">
+            <span id="liveDate">Today</span>
+            <a href="https://www.youtube.com/@B10newsAp/streams" target="_blank" class="live-indicator">
+                <span class="dot"></span> LIVE
+            </a>
+        </div>
+        <div class="menu-btn" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="close-btn" onclick="toggleMenu()">&times;</div>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Advertise</a>
+        <a href="#">Privacy Policy</a>
+    </div>
+
+    <div class="category-bar">
+        <div class="cat-item fixed-home" onclick="resetViewer()">🏠</div>
+        <div class="cat-scroll-area">
+            <a href="https://www.b10vartha.in/search/label/%E0%B0%9C%E0%B0%BE%E0%B0%A4%E0%B1%80%E0%B0%AF%E0%B0%82" target="_blank" class="cat-item" onclick="setActive(this)">జాతీయం</a>
+            <a href="https://www.b10vartha.in/search/label/%E0%B0%85%E0%B0%82%E0%B0%A4%E0%B0%B0%E0%B1%8D%E0%B0%9C%E0%B0%BE%E0%B0%A4%E0%B1%80%E0%B0%AF%E0%B0%82" target="_blank" class="cat-item" onclick="setActive(this)">అంతర్జాతీయం</a>
+            <a href="https://www.b10vartha.in/search/label/%E0%B0%B0%E0%B0%BE%E0%B0%9C%E0%B0%95%E0%B1%80%E0%B0%AF%E0%B0%BE%E0%B0%B2%E0%B1%81" target="_blank" class="cat-item" onclick="setActive(this)">రాజకీయాలు</a>
+            <a href="https://www.b10vartha.in/search/label/%E0%B0%86%E0%B0%B0%E0%B1%8B%E0%B0%97%E0%B1%8D%E0%B0%AF%E0%B0%82" target="_blank" class="cat-item" onclick="setActive(this)">ఆరోగ్యం</a>
+            <a href="https://www.b10vartha.in/search/label/%E0%B0%86%E0%B0%9F%E0%B0%B2%E0%B1%81" target="_blank" class="cat-item" onclick="setActive(this)">ఆటలు</a>
+            <a href="https://www.b10vartha.in/search/label/%E0%B0%B5%E0%B0%BE%E0%B0%A4%E0%B0%BE%E0%B0%B5%E0%B0%B0%E0%B0%A3%E0%B0%82" target="_blank" class="cat-item" onclick="setActive(this)">వాతావరణం</a>
+        </div>
+    </div>
+
+    <div class="ad-marquee">
+        <div class="marquee-content">
+            For Advertisements contact: 📞 9000607207 and 7207073777 ☎
+        </div>
+    </div>
+
+    <div class="control-bar">
+        <div class="page-indicator" id="pageIndicator">Page 1</div>
+        <button id="btnPrev" onclick="changePage(-1)"><i class="fa-solid fa-arrow-left"></i></button>
+        <button id="btnNext" onclick="changePage(1)"><i class="fa-solid fa-arrow-right"></i></button>
+        <button id="btnEdition" onclick="openEditionSelector()">📰</button>
+        <button id="btnCut" onclick="toggleClipper()">✂️</button>
+        <a id="btnPdf" href="#" target="_blank" class="pdf-btn">PDF</a>
+    </div>
+
+    <div class="viewer-container" id="viewerContainer">
+        <img id="pageImage" src="" alt="News Page" loading="lazy">
+        <div id="loadingMsg">Loading Edition...</div>
+    </div>
+
+    <div id="editionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditionSelector()">&times;</span>
+            <h3>Select Edition</h3>
+            <select id="dateSelect" onchange="loadSelectedEdition()">
+                </select>
+        </div>
+    </div>
+
+    <div id="clipperOverlay" class="clipper-overlay">
+        <div class="clipper-header">
+            <img src="assets/logo.png" alt="B10" style="height:30px;">
+            <button onclick="toggleClipper()" style="float:right; background:none; border:none; color:black; font-size:20px;">&times;</button>
+        </div>
+        <div class="clipper-body">
+            <p style="color:red; text-align:center; padding: 20px;">Use device screenshot for best quality, or tap 'Share' below.</p>
+            <img id="clipperImage" src="" style="width:100%;">
+        </div>
+        <div class="clipper-footer">
+            Read full NEWS at epaperb10vartha.in | Copyright © 2026 B10Vartha
+        </div>
+    </div>
+
+    <div class="footer-toggle" onclick="toggleFooter()">
+        <i class="fa-solid fa-caret-up" id="footerIcon"></i>
+    </div>
+    <div class="footer-panel" id="footerPanel">
+        Copyright © 2026 B10Vartha | Built by saas.ramu
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
