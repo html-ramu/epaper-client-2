@@ -4,8 +4,10 @@ on:
   push:
     paths:
       - 'uploads/**.pdf'
+
 permissions:
   contents: write
+
 jobs:
   convert-and-publish:
     runs-on: ubuntu-latest
@@ -13,40 +15,24 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
       - name: Install Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils
 
-      - name: Process PDF
-        run: |
-          PDF_FILE=$(find uploads -name "*.pdf" | head -n 1)
-          if [ -z "$PDF_FILE" ]; then echo "No PDF found!"; exit 1; fi
-
-          FILENAME=$(basename "$PDF_FILE")
-          DATE_ID="${FILENAME%.*}"
-          OUTPUT_DIR="papers/$DATE_ID"
-
-          mkdir -p "$OUTPUT_DIR"
-          mv "$PDF_FILE" "$OUTPUT_DIR/full.pdf"
-          pdftoppm -png -rx 150 -ry 150 "$OUTPUT_DIR/full.pdf" "$OUTPUT_DIR/page"
-
-          cd "$OUTPUT_DIR"
-          count=0
-          for f in page-*.png; do
-            count=$((count+1))
-            mv "$f" "$count.png"
-          done
-
-          cd ../..
-          NEW_LINE="    \"$DATE_ID\": { pages: $count, pdf: \"full.pdf\" },"
-          sed -i "/\/\/ ROBOT_ENTRY_POINT/i \\$NEW_LINE" app.js
-          git rm "$PDF_FILE"
+      - name: Run Processing Script
+        run: python scripts/process_pdf.py
 
       - name: Save Changes
         run: |
           git config --global user.name "B10 Robot"
-          git config --global user.email "robot@b10.com"
-          git add .
-          git commit -m "New Edition: $(date +'%d-%m-%Y')"
-          git push   
+          git config --global user.email "robot@b10vartha.in"
+          # This line below is the most important part:
+          git add papers/ app.js uploads/ index.html assets/
+          git commit -m "Auto-published edition with preview" || echo "No changes to commit"
+          git push
