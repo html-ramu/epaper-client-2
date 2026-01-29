@@ -1,31 +1,31 @@
 // CONFIGURATION
 const REPO_URL = "https://sekharbyiram-max.github.io/b10-epaper"; 
 
-// MOCK DATA 
+// MOCK DATA - The robot will add new dates here
 const editions = {
     "28-01-2026": { pages: 5, pdf: "full.pdf" },
     // ROBOT_ENTRY_POINT
     "30-01-2026": { pages: 5 },
-
     "29-01-2026": { pages: 5 },
     "27-01-2026": { pages: 8, pdf: "full.pdf" },
     "26-01-2026": { pages: 6, pdf: "full.pdf" },
     "25-01-2026": { pages: 8, pdf: "full.pdf" }
 };
 
-// --- NEW HELPER: Sort dates (Newest First) ---
+// --- NEW HELPER FUNCTION: Sort dates (Newest First) ---
 function getSortedDates() {
     return Object.keys(editions).sort((a, b) => {
+        // Convert "DD-MM-YYYY" string to a comparable Date object
         const [d1, m1, y1] = a.split('-').map(Number);
         const [d2, m2, y2] = b.split('-').map(Number);
         const dateA = new Date(y1, m1 - 1, d1);
         const dateB = new Date(y2, m2 - 1, d2);
-        return dateB - dateA; // Descending order
+        return dateB - dateA; // Sort in descending order (Newest first)
     });
 }
 
 // STATE
-let currentDateStr = "27-01-2026"; 
+let currentDateStr = ""; // Will be set on load
 let currentPage = 1;
 let totalPages = 1;
 let cropper = null; 
@@ -33,8 +33,6 @@ let cropper = null;
 // INITIALIZATION
 window.onload = function() {
     setupDateDisplay();
-    // Load the calculated current date (which is now guaranteed to be latest or today)
-    loadEdition(currentDateStr);
     
     // Add generic outside click to close modals
     window.onclick = function(event) {
@@ -52,29 +50,33 @@ function setupDateDisplay() {
     // Set Header to Today's Date (Calendar date)
     document.getElementById('headerDate').innerText = todayStr;
     
+    // --- SMART DATE SELECTION LOGIC ---
     const sortedDates = getSortedDates();
 
-    // LOGIC: If Today's paper exists, show it. Otherwise, show the Newest available.
-    if(editions[todayStr]) {
-        currentDateStr = todayStr;
-    } else if (sortedDates.length > 0) {
-        currentDateStr = sortedDates[0]; // Pick the newest date from the sorted list
+    if (sortedDates.length > 0) {
+        // Always pick the newest available edition
+        currentDateStr = sortedDates[0]; 
     } else {
-        currentDateStr = "01-01-2026"; // Fallback
+        // Fallback if no editions exist
+        currentDateStr = todayStr;
+        alert("No editions available.");
     }
     
+    // Load the selected edition and populate the dropdown
+    loadEdition(currentDateStr);
     populateDateDropdown();
 }
 
 function loadEdition(dateStr) {
     if (!editions[dateStr]) {
-        alert("Edition not found");
+        alert("Edition not found for date: " + dateStr);
         return;
     }
     currentDateStr = dateStr;
     currentPage = 1;
     totalPages = editions[dateStr].pages;
     
+    // Update the "LIVE" date in the header
     document.getElementById('liveDate').innerText = dateStr;
     
     // PDF Button Logic
@@ -94,16 +96,28 @@ function updateViewer() {
     const imgElement = document.getElementById('pageImage');
     const indicator = document.getElementById('pageIndicator');
     
+    // Show loading state
     imgElement.style.opacity = "0.5";
     imgElement.src = imgPath;
     indicator.innerText = `Page ${currentPage} / ${totalPages}`;
 
-    imgElement.onload = function() { imgElement.style.opacity = "1"; };
-    imgElement.onerror = function() { imgElement.alt = "Page not found or uploading..."; };
+    // On successful load
+    imgElement.onload = function() { 
+        imgElement.style.opacity = "1"; 
+    };
+    
+    // On error (e.g., missing image)
+    imgElement.onerror = function() { 
+        imgElement.style.opacity = "1";
+        // You could display a placeholder image here if you want
+        // imgElement.src = 'assets/no-page.png'; 
+    };
 
+    // Update navigation buttons
     document.getElementById('btnPrev').disabled = (currentPage === 1);
     document.getElementById('btnNext').disabled = (currentPage === totalPages);
 
+    // Update arrow buttons if they exist
     const leftArr = document.querySelector('.left-arrow');
     const rightArr = document.querySelector('.right-arrow');
     if (leftArr) leftArr.disabled = (currentPage === 1);
@@ -155,12 +169,14 @@ function closeInfoModal(modalId) {
     document.getElementById(modalId).style.display = "none";
 }
 
-// 5. EDITION SELECTOR (Fixed Sorting)
+// 5. EDITION SELECTOR (Fixed Sorting & Selection)
 function populateDateDropdown() {
     const select = document.getElementById('dateSelect');
+    if (!select) return;
     select.innerHTML = "";
     
-    const sortedDates = getSortedDates(); // Use the sorted list
+    // Use the sorted dates list
+    const sortedDates = getSortedDates(); 
 
     sortedDates.forEach(date => {
         const option = document.createElement("option");
