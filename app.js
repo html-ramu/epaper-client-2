@@ -1,17 +1,9 @@
 // CONFIGURATION
 const REPO_URL = "https://epaperb10vartha.in"; 
 
-// MOCK DATA 
+// DATA 
 const editions = {
-    "28-01-2026": { pages: 5, pdf: "full.pdf" },
     // ROBOT_ENTRY_POINT
-    "31-01-2026": { pages: 3, pdf: "full.pdf" },
-
-    "30-01-2026": { pages: 5, pdf: "full.pdf" },
-    "29-01-2026": { pages: 5 },
-    "27-01-2026": { pages: 8, pdf: "full.pdf" },
-    "26-01-2026": { pages: 6, pdf: "full.pdf" },
-    "25-01-2026": { pages: 8, pdf: "full.pdf" }
 };
 
 // --- HELPER FUNCTION: Sort dates (Newest First) ---
@@ -57,43 +49,36 @@ function setupDateDisplay() {
     const sortedDates = getSortedDates();
     if (sortedDates.length > 0) {
         currentDateStr = sortedDates[0]; 
+        loadEdition(currentDateStr);
+        populateDateDropdown();
     } else {
-        currentDateStr = todayStr;
-        alert("No editions available.");
+        // CLEAN SLATE MODE: No editions yet
+        document.getElementById('liveDate').innerText = "Coming Soon";
+        document.getElementById('pageIndicator').innerText = "Waiting for Update...";
+        // Hide controls gracefully
+        document.getElementById('btnPrev').disabled = true;
+        document.getElementById('btnNext').disabled = true;
+        document.getElementById('btnPdf').style.display = 'none';
     }
-    
-    loadEdition(currentDateStr);
-    populateDateDropdown();
 }
 
 function loadEdition(dateStr) {
-    if (!editions[dateStr]) {
-        alert("Edition not found for date: " + dateStr);
-        return;
-    }
+    if (!editions[dateStr]) return;
+
     currentDateStr = dateStr;
     currentPage = 1;
     totalPages = editions[dateStr].pages;
     
     document.getElementById('liveDate').innerText = dateStr;
     
-    // --- UPDATED: UNIFIED PDF LOGIC ---
-    // This now looks for 'full.pdf' inside the papers folder for EVERY date.
-    // This works for old manual uploads AND the new robot uploads.
+    // --- UNIFIED PDF LOGIC ---
     const pdfBtn = document.getElementById('btnPdf');
     if (pdfBtn) {
-        // Always look in: papers/DD-MM-YYYY/full.pdf
         const pdfUrl = `papers/${dateStr}/full.pdf`;
 
-        // Clear any old click events
         pdfBtn.onclick = null; 
-        
-        // Set Link
         pdfBtn.href = pdfUrl;
-        
-        // FORCE DOWNLOAD: Tells mobile browsers to save the file
         pdfBtn.setAttribute("download", `B10-Vartha-${dateStr}.pdf`);
-        
         pdfBtn.target = "_blank"; 
         pdfBtn.style.display = "inline-block"; 
         pdfBtn.innerText = "PDF"; 
@@ -181,8 +166,10 @@ function loadSelectedEdition() {
     closeEditionSelector();
 }
 
-// 5. CLIPPER LOGIC (Big Logo + 2 Line Footer)
+// 5. CLIPPER LOGIC
 function toggleClipper() {
+    if (!cropper && (!currentDateStr || totalPages === 0)) return; // Prevent clipper if no paper
+    
     const modal = document.getElementById('clipperOverlay');
     const pageImg = document.getElementById('pageImage');
     const clipImg = document.getElementById('clipperImage');
