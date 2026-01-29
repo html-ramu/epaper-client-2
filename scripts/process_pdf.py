@@ -59,9 +59,9 @@ def main():
     if os.path.exists(first_page_path):
         create_smart_preview(date_str, first_page_path)
 
-    # 7. Clean up
-    os.remove(pdf_path)
-    print("PDF processed and removed.")
+    # 7. Clean up (DISABLED: Keep PDF for WhatsApp Sharing)
+    # os.remove(pdf_path)
+    print("PDF processed. Kept original file for WhatsApp sharing.")
 
 def update_app_js(date_key, pages):
     with open(APP_JS_FILE, "r", encoding="utf-8") as f:

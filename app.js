@@ -75,59 +75,23 @@ function loadEdition(dateStr) {
     
     document.getElementById('liveDate').innerText = dateStr;
     
-    // --- UPDATED: PDF FILE SHARING LOGIC ---
+    // --- UPDATED: SIMPLE & SAFE PDF BUTTON (Solves Mobile 403 Error) ---
     const pdfBtn = document.getElementById('btnPdf');
     if (pdfBtn) {
+        // Direct link to the file. Works on 100% of devices.
         const pdfUrl = `${REPO_URL}/uploads/${dateStr}.pdf`;
 
-        pdfBtn.href = "#"; 
-        pdfBtn.onclick = (e) => {
-            e.preventDefault(); 
-            // Call the new "File Sharer" function
-            sharePdfFile(pdfUrl, dateStr);
-        };
+        // Clear any old click events
+        pdfBtn.onclick = null; 
+        
+        // Set direct download behavior
+        pdfBtn.href = pdfUrl;
+        pdfBtn.target = "_blank"; // Opens in new tab/download manager
         pdfBtn.style.display = "inline-block"; 
+        pdfBtn.innerText = "PDF"; // Ensure text is reset
     }
     
     updateViewer();
-}
-
-// --- NEW FUNCTION: DOWNLOAD & SHARE FILE (No Link) ---
-async function sharePdfFile(url, date) {
-    const btn = document.getElementById('btnPdf');
-    const originalText = btn.innerText;
-    
-    try {
-        // 1. Notify user (downloading takes 1-2 seconds)
-        btn.innerText = "⏳..."; 
-        
-        // 2. Fetch the PDF from the server
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("PDF not found on server");
-        
-        const blob = await response.blob();
-        
-        // 3. Create a File Object
-        const file = new File([blob], `B10-Vartha-${date}.pdf`, { type: "application/pdf" });
-
-        // 4. Share the FILE directly
-        if (navigator.share && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-                files: [file],
-                title: `B10 Vartha - ${date}`,
-                text: `Here is the ePaper for ${date}`
-            });
-        } else {
-            // Fallback for PC (Just opens it)
-            window.open(url, '_blank');
-        }
-    } catch (err) {
-        console.log("Sharing failed:", err);
-        alert("Could not share file directly. Opening link instead.");
-        window.open(url, '_blank');
-    } finally {
-        btn.innerText = originalText;
-    }
 }
 
 function updateViewer() {
