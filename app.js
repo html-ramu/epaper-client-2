@@ -43,14 +43,13 @@ window.onload = function() {
 
 // 1. DATE & DISPLAY LOGIC
 function setupDateDisplay() {
-    // FIX 1: FORCE REAL "TODAY" DATE IN HEADER
     const today = new Date();
     const d = String(today.getDate()).padStart(2, '0');
     const m = String(today.getMonth() + 1).padStart(2, '0');
     const y = today.getFullYear();
     const todayStr = `${d}-${m}-${y}`;
     
-    // Set Header to Today's Date (if the element exists - we removed ID but checking just in case)
+    // Set Header to Today's Date (if element exists)
     const headerDateEl = document.getElementById('headerDate');
     if (headerDateEl) headerDateEl.innerText = todayStr;
     
@@ -76,7 +75,6 @@ function loadEdition(dateStr) {
     currentPage = 1;
     totalPages = editions[dateStr].pages;
     
-    // Update the "LIVE" date in the header
     document.getElementById('liveDate').innerText = dateStr;
     
     // PDF Button Logic
@@ -142,7 +140,6 @@ function setActive(element) {
     element.classList.add('active');
 }
 
-// 4. INFO MODALS LOGIC
 function openInfoModal(modalId) {
     document.getElementById(modalId).style.display = "block";
     document.getElementById("sidebar").style.width = "0";
@@ -152,7 +149,7 @@ function closeInfoModal(modalId) {
     document.getElementById(modalId).style.display = "none";
 }
 
-// 5. EDITION SELECTOR
+// 4. EDITION SELECTOR
 function populateDateDropdown() {
     const select = document.getElementById('dateSelect');
     if (!select) return;
@@ -180,7 +177,7 @@ function loadSelectedEdition() {
     closeEditionSelector();
 }
 
-// 6. CLIPPER LOGIC
+// 5. CLIPPER LOGIC
 function toggleClipper() {
     const modal = document.getElementById('clipperOverlay');
     const pageImg = document.getElementById('pageImage');
@@ -201,6 +198,7 @@ function toggleClipper() {
     }
 }
 
+// --- UPDATED BRANDING LOGIC (Bigger Logo & 2-Line Footer) ---
 function getBrandedCanvas() {
     if (!cropper) return null;
     const cropCanvas = cropper.getCroppedCanvas();
@@ -210,8 +208,11 @@ function getBrandedCanvas() {
     const finalWidth = Math.max(cropCanvas.width, minWidth);
     const scale = finalWidth / 800;
 
-    const headerHeight = Math.round(100 * scale); 
-    const footerHeight = Math.round(70 * scale); 
+    // 1. INCREASE HEADER & FOOTER HEIGHT
+    // Header was 100, now 160 to fit big logo
+    const headerHeight = Math.round(160 * scale); 
+    // Footer was 70, now 110 to fit 2 lines
+    const footerHeight = Math.round(110 * scale); 
     const finalHeight = cropCanvas.height + headerHeight + footerHeight;
 
     const finalCanvas = document.createElement('canvas');
@@ -219,25 +220,29 @@ function getBrandedCanvas() {
     finalCanvas.height = finalHeight;
     const ctx = finalCanvas.getContext('2d');
 
+    // Background
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, finalWidth, finalHeight);
 
+    // 2. DRAW BIGGER LOGO
     const logoImg = document.querySelector('.logo-area img'); 
     if (logoImg) {
-        const logoH = Math.round(60 * scale); 
+        // Logo height was 60, now 120 (2x bigger)
+        const logoH = Math.round(120 * scale); 
         const logoW = (logoImg.naturalWidth / logoImg.naturalHeight) * logoH;
         const logoX = (finalWidth - logoW) / 2;
+        // Center vertically in the new taller header
         const logoY = (headerHeight - logoH) / 2;
         ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
     }
 
-    // FIX 3: USE THE EDITION DATE (currentDateStr), NOT SYSTEM DATE
+    // Draw Date
     ctx.textAlign = "left";
     ctx.fillStyle = "#333333";
     ctx.font = `bold ${Math.round(20 * scale)}px Arial`;
-    // Changed 'dateStr' to 'currentDateStr' here
     ctx.fillText(currentDateStr, 20 * scale, headerHeight / 2 + (8 * scale));
 
+    // Separator Line
     ctx.beginPath();
     ctx.moveTo(20 * scale, headerHeight - 2);
     ctx.lineTo(finalWidth - (20 * scale), headerHeight - 2);
@@ -245,17 +250,26 @@ function getBrandedCanvas() {
     ctx.lineWidth = 2 * scale;
     ctx.stroke();
 
+    // Draw News Image
     const cropX = (finalWidth - cropCanvas.width) / 2;
     ctx.drawImage(cropCanvas, cropX, headerHeight);
 
+    // 3. DRAW 2-LINE FOOTER
     ctx.fillStyle = "#008000"; 
     ctx.fillRect(0, finalHeight - footerHeight, finalWidth, footerHeight);
 
     ctx.textAlign = "center";
     ctx.fillStyle = "#ffffff"; 
+    
+    // Line 1: Main Link (Moved up slightly)
     const fontMain = Math.round(24 * scale); 
     ctx.font = `bold ${fontMain}px Arial`;
-    ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - (footerHeight / 2) + (8 * scale));
+    ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - (footerHeight * 0.6));
+
+    // Line 2: Built By (Added below)
+    const fontSub = Math.round(16 * scale); // Smaller font
+    ctx.font = `normal ${fontSub}px Arial`;
+    ctx.fillText("Built by html-ramu", finalWidth / 2, finalHeight - (footerHeight * 0.25));
 
     return finalCanvas;
 }
@@ -289,7 +303,7 @@ function downloadClip() {
     });
 }
 
-// 7. FOOTER LOGIC
+// 6. FOOTER LOGIC
 function toggleFooter() {
     const footer = document.getElementById("sliding-footer");
     footer.classList.toggle("active");
