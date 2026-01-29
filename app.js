@@ -75,20 +75,34 @@ function loadEdition(dateStr) {
     
     document.getElementById('liveDate').innerText = dateStr;
     
-    // --- UPDATED: SIMPLE & SAFE PDF BUTTON (Solves Mobile 403 Error) ---
+    // --- UPDATED: HYBRID PDF LOGIC (Works for OLD & NEW) ---
     const pdfBtn = document.getElementById('btnPdf');
     if (pdfBtn) {
-        // Direct link to the file. Works on 100% of devices.
-        const pdfUrl = `${REPO_URL}/uploads/${dateStr}.pdf`;
+        let pdfUrl = "";
+
+        // CHECK: Is this an old manual entry (has 'pdf' property) or a new robot entry?
+        if (editions[dateStr].pdf) {
+            // OLD WAY: Look inside the specific paper folder
+            // e.g. papers/27-01-2026/full.pdf
+            pdfUrl = `papers/${dateStr}/${editions[dateStr].pdf}`;
+        } else {
+            // NEW WAY: Look in the uploads folder
+            // e.g. uploads/30-01-2026.pdf
+            pdfUrl = `uploads/${dateStr}.pdf`;
+        }
 
         // Clear any old click events
         pdfBtn.onclick = null; 
         
-        // Set direct download behavior
+        // Set properties
         pdfBtn.href = pdfUrl;
-        pdfBtn.target = "_blank"; // Opens in new tab/download manager
+        
+        // FORCE DOWNLOAD: Tells mobile browsers to save instead of opening blank tab
+        pdfBtn.setAttribute("download", `B10-Vartha-${dateStr}.pdf`);
+        
+        pdfBtn.target = "_blank"; 
         pdfBtn.style.display = "inline-block"; 
-        pdfBtn.innerText = "PDF"; // Ensure text is reset
+        pdfBtn.innerText = "PDF"; 
     }
     
     updateViewer();
