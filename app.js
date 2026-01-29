@@ -12,20 +12,19 @@ const editions = {
     "25-01-2026": { pages: 8, pdf: "full.pdf" }
 };
 
-// --- NEW HELPER FUNCTION: Sort dates (Newest First) ---
+// --- HELPER FUNCTION: Sort dates (Newest First) ---
 function getSortedDates() {
     return Object.keys(editions).sort((a, b) => {
-        // Convert "DD-MM-YYYY" string to a comparable Date object
         const [d1, m1, y1] = a.split('-').map(Number);
         const [d2, m2, y2] = b.split('-').map(Number);
         const dateA = new Date(y1, m1 - 1, d1);
         const dateB = new Date(y2, m2 - 1, d2);
-        return dateB - dateA; // Sort in descending order (Newest first)
+        return dateB - dateA; 
     });
 }
 
 // STATE
-let currentDateStr = ""; // Will be set on load
+let currentDateStr = ""; 
 let currentPage = 1;
 let totalPages = 1;
 let cropper = null; 
@@ -44,25 +43,26 @@ window.onload = function() {
 
 // 1. DATE & DISPLAY LOGIC
 function setupDateDisplay() {
+    // FIX 1: FORCE REAL "TODAY" DATE IN HEADER
     const today = new Date();
-    const todayStr = today.getDate().toString().padStart(2, '0') + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getFullYear();
+    const d = String(today.getDate()).padStart(2, '0');
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const y = today.getFullYear();
+    const todayStr = `${d}-${m}-${y}`;
     
-    // Set Header to Today's Date (Calendar date)
-    document.getElementById('headerDate').innerText = todayStr;
+    // Set Header to Today's Date
+    const headerDateEl = document.getElementById('headerDate');
+    if (headerDateEl) headerDateEl.innerText = todayStr;
     
-    // --- SMART DATE SELECTION LOGIC ---
+    // SMART STARTUP: Pick newest edition
     const sortedDates = getSortedDates();
-
     if (sortedDates.length > 0) {
-        // Always pick the newest available edition
         currentDateStr = sortedDates[0]; 
     } else {
-        // Fallback if no editions exist
         currentDateStr = todayStr;
         alert("No editions available.");
     }
     
-    // Load the selected edition and populate the dropdown
     loadEdition(currentDateStr);
     populateDateDropdown();
 }
@@ -79,13 +79,18 @@ function loadEdition(dateStr) {
     // Update the "LIVE" date in the header
     document.getElementById('liveDate').innerText = dateStr;
     
-    // PDF Button Logic
+    // FIX 2: RESTORE PDF BUTTON LOGIC
     const pdfBtn = document.getElementById('btnPdf');
-    if(editions[dateStr].pdf) {
-        pdfBtn.href = `papers/${dateStr}/${editions[dateStr].pdf}`;
-        pdfBtn.style.display = "inline-block";
-    } else {
-        pdfBtn.style.display = "none"; // Hide if no PDF defined
+    if (pdfBtn) {
+        // If the edition has a specific PDF defined, use it. 
+        // Otherwise, assume it is in the "uploads" folder (Phase 2 automation fallback).
+        const pdfUrl = editions[dateStr].pdf 
+            ? `papers/${dateStr}/${editions[dateStr].pdf}` 
+            : `uploads/${dateStr}.pdf`;
+
+        pdfBtn.href = pdfUrl;
+        pdfBtn.style.display = "inline-block"; // Always show the button
+        pdfBtn.target = "_blank"; // Open in new tab
     }
     
     updateViewer();
@@ -96,28 +101,16 @@ function updateViewer() {
     const imgElement = document.getElementById('pageImage');
     const indicator = document.getElementById('pageIndicator');
     
-    // Show loading state
     imgElement.style.opacity = "0.5";
     imgElement.src = imgPath;
     indicator.innerText = `Page ${currentPage} / ${totalPages}`;
 
-    // On successful load
-    imgElement.onload = function() { 
-        imgElement.style.opacity = "1"; 
-    };
-    
-    // On error (e.g., missing image)
-    imgElement.onerror = function() { 
-        imgElement.style.opacity = "1";
-        // You could display a placeholder image here if you want
-        // imgElement.src = 'assets/no-page.png'; 
-    };
+    imgElement.onload = function() { imgElement.style.opacity = "1"; };
+    imgElement.onerror = function() { imgElement.style.opacity = "1"; };
 
-    // Update navigation buttons
     document.getElementById('btnPrev').disabled = (currentPage === 1);
     document.getElementById('btnNext').disabled = (currentPage === totalPages);
 
-    // Update arrow buttons if they exist
     const leftArr = document.querySelector('.left-arrow');
     const rightArr = document.querySelector('.right-arrow');
     if (leftArr) leftArr.disabled = (currentPage === 1);
@@ -143,41 +136,31 @@ function changePage(delta) {
 // 3. MENU & UI INTERACTIONS
 function toggleMenu() {
     const sidebar = document.getElementById("sidebar");
-    if (sidebar.style.width === "250px") {
-        sidebar.style.width = "0";
-    } else {
-        sidebar.style.width = "250px";
-    }
+    sidebar.style.width = (sidebar.style.width === "250px") ? "0" : "250px";
 }
 
 function setActive(element) {
-    const items = document.querySelectorAll('.cat-item');
-    items.forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
     element.classList.add('active');
 }
 
-// 4. INFO MODALS LOGIC (About, Contact, etc.)
+// 4. INFO MODALS LOGIC
 function openInfoModal(modalId) {
     document.getElementById(modalId).style.display = "block";
-    const sidebar = document.getElementById("sidebar");
-    if (sidebar.style.width === "250px") {
-        sidebar.style.width = "0";
-    }
+    document.getElementById("sidebar").style.width = "0";
 }
 
 function closeInfoModal(modalId) {
     document.getElementById(modalId).style.display = "none";
 }
 
-// 5. EDITION SELECTOR (Fixed Sorting & Selection)
+// 5. EDITION SELECTOR
 function populateDateDropdown() {
     const select = document.getElementById('dateSelect');
     if (!select) return;
     select.innerHTML = "";
     
-    // Use the sorted dates list
     const sortedDates = getSortedDates(); 
-
     sortedDates.forEach(date => {
         const option = document.createElement("option");
         option.value = date;
@@ -185,22 +168,17 @@ function populateDateDropdown() {
         select.appendChild(option);
     });
     
-    // Ensure the currently selected date is highlighted in the dropdown
     select.value = currentDateStr;
 }
 
 function openEditionSelector() { 
-    // Refresh dropdown selection before showing
     const select = document.getElementById('dateSelect');
     if(select) select.value = currentDateStr;
     document.getElementById('editionModal').style.display = "block"; 
 }
-
 function closeEditionSelector() { document.getElementById('editionModal').style.display = "none"; }
-
 function loadSelectedEdition() {
-    const selectedDate = document.getElementById('dateSelect').value;
-    loadEdition(selectedDate);
+    loadEdition(document.getElementById('dateSelect').value);
     closeEditionSelector();
 }
 
@@ -216,13 +194,10 @@ function toggleClipper() {
     } else {
         modal.style.display = "flex"; 
         clipImg.src = pageImg.src;
-
         setTimeout(() => {
             if (cropper) cropper.destroy();
             cropper = new Cropper(clipImg, {
-                viewMode: 1, dragMode: 'move', autoCropArea: 0.5, 
-                guides: true, background: false, movable: true,
-                zoomable: true, cropBoxMovable: true, cropBoxResizable: true,
+                viewMode: 1, dragMode: 'move', autoCropArea: 0.5, movable: true, zoomable: true
             });
         }, 100);
     }
@@ -259,7 +234,11 @@ function getBrandedCanvas() {
     }
 
     const today = new Date();
-    const dateStr = today.getDate().toString().padStart(2, '0') + "-" + (today.getMonth() + 1).toString().padStart(2, '0') + "-" + today.getFullYear();
+    const d = String(today.getDate()).padStart(2, '0');
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const y = today.getFullYear();
+    const dateStr = `${d}-${m}-${y}`;
+    
     ctx.textAlign = "left";
     ctx.fillStyle = "#333333";
     ctx.font = `bold ${Math.round(20 * scale)}px Arial`;
