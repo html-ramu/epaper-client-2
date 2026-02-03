@@ -4,6 +4,8 @@ const REPO_URL = "https://epaperb10vartha.in";
 // DATA 
 const editions = {
     // ROBOT_ENTRY_POINT
+    "03-02-2026": { pages: 5, pdf: "full.pdf" },
+
     "02-02-2026": { pages: 6, pdf: "full.pdf" },
 
     "01-02-2026": { pages: 6, pdf: "full.pdf" },
