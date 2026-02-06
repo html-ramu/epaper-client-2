@@ -109,7 +109,10 @@ body {
 
 /* Viewer */
 .viewer-container {
-    min-height: 80vh; text-align: center; padding-bottom: 50px; position: relative;
+    min-height: auto;
+    text-align: center;
+    padding-bottom: 0px;
+    position: relative;
     padding-left: 4px; padding-right: 4px;
 }
 .viewer-container img {
@@ -207,3 +210,26 @@ body {
 .right-arrow { right: 5px; }
 .nav-arrow:disabled { opacity: 0; pointer-events: none; }
 .clipper-overlay .nav-arrow { display: none; }
+/* కొత్త ఫుటర్ స్టైల్స్ */
+.static-footer {
+    background-color: #222;
+    color: white;
+    text-align: center;
+    padding: 20px 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.static-footer p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #cccccc;
+    line-height: 1.5;
+}
+
+/* డెవలపర్ పేరు బ్లూ కలర్ */
+.dev-credit {
+    color: #2196F3 !important;
+    font-weight: bold;
+    font-size: 15px !important;
+}

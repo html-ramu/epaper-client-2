@@ -301,8 +301,4 @@ function downloadClip() {
     });
 }
 
-// 6. FOOTER LOGIC
-function toggleFooter() {
-    const footer = document.getElementById("sliding-footer");
-    footer.classList.toggle("active");
-}
+
