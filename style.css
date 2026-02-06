@@ -109,7 +109,7 @@ body {
 
 /* Viewer */
 .viewer-container {
-    min-height: auto;
+    min-height: 60vh;
     text-align: center;
     padding-bottom: 0px;
     position: relative;
