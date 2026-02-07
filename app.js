@@ -1,10 +1,9 @@
 // CONFIGURATION
-const REPO_URL = ""; 
+const REPO_URL = "https://html-ramu.github.io/epaper-client-2"; 
 
 // DATA 
 const editions = {
     // ROBOT_ENTRY_POINT
-    
 };
 
 // --- HELPER FUNCTION: Sort dates (Newest First) ---
@@ -27,6 +26,7 @@ let cropper = null;
 // INITIALIZATION
 window.onload = function() {
     setupDateDisplay();
+    // Modal Close Logic
     window.onclick = function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = "none";
@@ -43,8 +43,7 @@ function setupDateDisplay() {
     const todayStr = `${d}-${m}-${y}`;
     
     // Attempt to set header date
-    const headerDateEl = document.getElementById('headerDate');
-    if (headerDateEl) headerDateEl.innerText = todayStr;
+    const liveDateEl = document.getElementById('liveDate');
     
     // SMART STARTUP: Pick newest edition
     const sortedDates = getSortedDates();
@@ -54,12 +53,18 @@ function setupDateDisplay() {
         populateDateDropdown();
     } else {
         // CLEAN SLATE MODE: No editions yet
-        document.getElementById('liveDate').innerText = "Coming Soon";
-        document.getElementById('pageIndicator').innerText = "Waiting for Update...";
+        if(liveDateEl) liveDateEl.innerText = "No Papers";
+        const indicator = document.getElementById('pageIndicator');
+        if(indicator) indicator.innerText = "Waiting for Update...";
+        
         // Hide controls gracefully
-        document.getElementById('btnPrev').disabled = true;
-        document.getElementById('btnNext').disabled = true;
-        document.getElementById('btnPdf').style.display = 'none';
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const btnPdf = document.getElementById('btnPdf');
+        
+        if(btnPrev) btnPrev.disabled = true;
+        if(btnNext) btnNext.disabled = true;
+        if(btnPdf) btnPdf.style.display = 'none';
     }
 }
 
@@ -70,7 +75,8 @@ function loadEdition(dateStr) {
     currentPage = 1;
     totalPages = editions[dateStr].pages;
     
-    document.getElementById('liveDate').innerText = dateStr;
+    const liveDateEl = document.getElementById('liveDate');
+    if(liveDateEl) liveDateEl.innerText = dateStr;
     
     // --- UNIFIED PDF LOGIC ---
     const pdfBtn = document.getElementById('btnPdf');
@@ -79,7 +85,7 @@ function loadEdition(dateStr) {
 
         pdfBtn.onclick = null; 
         pdfBtn.href = pdfUrl;
-        pdfBtn.setAttribute("download", `B10-Vartha-${dateStr}.pdf`);
+        pdfBtn.setAttribute("download", `Client-2-Paper-${dateStr}.pdf`);
         pdfBtn.target = "_blank"; 
         pdfBtn.style.display = "inline-block"; 
         pdfBtn.innerText = "PDF"; 
@@ -93,27 +99,26 @@ function updateViewer() {
     const imgElement = document.getElementById('pageImage');
     const indicator = document.getElementById('pageIndicator');
     
-    imgElement.style.opacity = "0.5";
-    imgElement.src = imgPath;
-    indicator.innerText = `Page ${currentPage} / ${totalPages}`;
+    if(imgElement) {
+        imgElement.style.opacity = "0.5";
+        imgElement.src = imgPath;
+        imgElement.onload = function() { imgElement.style.opacity = "1"; };
+        imgElement.onerror = function() { imgElement.style.opacity = "1"; };
+    }
+    
+    if(indicator) indicator.innerText = `Page ${currentPage} / ${totalPages}`;
 
-    imgElement.onload = function() { imgElement.style.opacity = "1"; };
-    imgElement.onerror = function() { imgElement.style.opacity = "1"; };
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
 
-    document.getElementById('btnPrev').disabled = (currentPage === 1);
-    document.getElementById('btnNext').disabled = (currentPage === totalPages);
+    if(btnPrev) btnPrev.disabled = (currentPage === 1);
+    if(btnNext) btnNext.disabled = (currentPage === totalPages);
 }
 
 // 2. NAVIGATION
 function changePage(delta) {
     const newPage = currentPage + delta;
     if (newPage >= 1 && newPage <= totalPages) {
-        try {
-            const audio = new Audio('assets/page-flip-4.mp3');
-            audio.volume = 0.5;
-            audio.play().catch(e => console.log("Audio waiting for interaction"));
-        } catch (err) { console.log("Audio error", err); }
-
         currentPage = newPage;
         updateViewer();
         window.scrollTo(0, 120); 
@@ -123,21 +128,24 @@ function changePage(delta) {
 // 3. MENU & UI INTERACTIONS
 function toggleMenu() {
     const sidebar = document.getElementById("sidebar");
-    sidebar.style.width = (sidebar.style.width === "250px") ? "0" : "250px";
+    if(sidebar) sidebar.style.width = (sidebar.style.width === "250px") ? "0" : "250px";
 }
 
-function setActive(element) {
-    document.querySelectorAll('.cat-item').forEach(item => item.classList.remove('active'));
-    element.classList.add('active');
+function resetViewer() {
+    const sorted = getSortedDates();
+    if(sorted.length > 0) loadEdition(sorted[0]);
 }
 
 function openInfoModal(modalId) {
-    document.getElementById(modalId).style.display = "block";
-    document.getElementById("sidebar").style.width = "0";
+    const modal = document.getElementById(modalId);
+    const sidebar = document.getElementById("sidebar");
+    if(modal) modal.style.display = "block";
+    if(sidebar) sidebar.style.width = "0";
 }
 
 function closeInfoModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
+    const modal = document.getElementById(modalId);
+    if(modal) modal.style.display = "none";
 }
 
 // 4. EDITION SELECTOR
@@ -158,18 +166,27 @@ function populateDateDropdown() {
 
 function openEditionSelector() { 
     const select = document.getElementById('dateSelect');
-    if(select) select.value = currentDateStr;
-    document.getElementById('editionModal').style.display = "block"; 
+    if(select && currentDateStr) select.value = currentDateStr;
+    const modal = document.getElementById('editionModal');
+    if(modal) modal.style.display = "block"; 
 }
-function closeEditionSelector() { document.getElementById('editionModal').style.display = "none"; }
+
+function closeEditionSelector() { 
+    const modal = document.getElementById('editionModal');
+    if(modal) modal.style.display = "none"; 
+}
+
 function loadSelectedEdition() {
-    loadEdition(document.getElementById('dateSelect').value);
-    closeEditionSelector();
+    const select = document.getElementById('dateSelect');
+    if(select) {
+        loadEdition(select.value);
+        closeEditionSelector();
+    }
 }
 
 // 5. CLIPPER LOGIC
 function toggleClipper() {
-    if (!cropper && (!currentDateStr || totalPages === 0)) return; // Prevent clipper if no paper
+    if (!cropper && (!currentDateStr || totalPages === 0)) return; 
     
     const modal = document.getElementById('clipperOverlay');
     const pageImg = document.getElementById('pageImage');
@@ -199,8 +216,8 @@ function getBrandedCanvas() {
     const finalWidth = Math.max(cropCanvas.width, minWidth);
     const scale = finalWidth / 800;
 
-    const headerHeight = Math.round(160 * scale); 
-    const footerHeight = Math.round(110 * scale); 
+    const headerHeight = Math.round(100 * scale); 
+    const footerHeight = Math.round(80 * scale); 
     const finalHeight = cropCanvas.height + headerHeight + footerHeight;
 
     const finalCanvas = document.createElement('canvas');
@@ -212,47 +229,28 @@ function getBrandedCanvas() {
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, finalWidth, finalHeight);
 
-    // Big Logo
-    const logoImg = document.querySelector('.logo-area img'); 
-    if (logoImg) {
-        const logoH = Math.round(120 * scale); 
-        const logoW = (logoImg.naturalWidth / logoImg.naturalHeight) * logoH;
-        const logoX = (finalWidth - logoW) / 2;
-        const logoY = (headerHeight - logoH) / 2;
-        ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
-    }
-
-    // Edition Date
-    ctx.textAlign = "left";
+    // Header Text (Since no Logo Logic provided for canvas)
     ctx.fillStyle = "#333333";
-    ctx.font = `bold ${Math.round(20 * scale)}px Arial`;
-    ctx.fillText(currentDateStr, 20 * scale, headerHeight / 2 + (8 * scale));
-
-    // Separator
-    ctx.beginPath();
-    ctx.moveTo(20 * scale, headerHeight - 2);
-    ctx.lineTo(finalWidth - (20 * scale), headerHeight - 2);
-    ctx.strokeStyle = "#eeeeee";
-    ctx.lineWidth = 2 * scale;
-    ctx.stroke();
+    ctx.font = `bold ${Math.round(24 * scale)}px Arial`;
+    ctx.fillText("Client-2 ePaper", 20 * scale, headerHeight / 2);
+    
+    // Date
+    ctx.font = `normal ${Math.round(18 * scale)}px Arial`;
+    ctx.fillText(currentDateStr, 20 * scale, headerHeight / 2 + (30 * scale));
 
     // Image
     const cropX = (finalWidth - cropCanvas.width) / 2;
     ctx.drawImage(cropCanvas, cropX, headerHeight);
 
     // Footer
-    ctx.fillStyle = "#008000"; 
+    ctx.fillStyle = "#222"; 
     ctx.fillRect(0, finalHeight - footerHeight, finalWidth, footerHeight);
 
     ctx.textAlign = "center";
     ctx.fillStyle = "#ffffff"; 
-    const fontMain = Math.round(24 * scale); 
+    const fontMain = Math.round(16 * scale); 
     ctx.font = `bold ${fontMain}px Arial`;
-    ctx.fillText("Read full NEWS at epaperb10vartha.in", finalWidth / 2, finalHeight - (footerHeight * 0.6));
-
-    const fontSub = Math.round(16 * scale); 
-    ctx.font = `normal ${fontSub}px Arial`;
-    ctx.fillText("Built by html-ramu", finalWidth / 2, finalHeight - (footerHeight * 0.25));
+    ctx.fillText("Read full NEWS at html-ramu.github.io/epaper-client-2", finalWidth / 2, finalHeight - (footerHeight * 0.4));
 
     return finalCanvas;
 }
@@ -262,8 +260,8 @@ async function shareClip() {
     if (!brandedCanvas) return;
     brandedCanvas.toBlob(async (blob) => {
         if (navigator.share && navigator.canShare) {
-            const file = new File([blob], "b10-news-clip.png", { type: "image/png" });
-            try { await navigator.share({ files: [file], title: 'B10 Vartha News', text: 'Read full NEWS at epaperb10vartha.in' }); } 
+            const file = new File([blob], "news-clip.png", { type: "image/png" });
+            try { await navigator.share({ files: [file], title: 'News Clip', text: 'Read full NEWS at Client-2' }); } 
             catch (err) { console.log("Error sharing:", err); }
         } else {
             alert("Sharing is best on Mobile. On Desktop, use 'Download'.");
@@ -279,11 +277,9 @@ function downloadClip() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `B10-News-Clip-${Date.now()}.png`;
+        a.download = `News-Clip-${Date.now()}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
     });
 }
-
-
