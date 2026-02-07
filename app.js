@@ -1,29 +1,10 @@
 // CONFIGURATION
-const REPO_URL = "https://epaperb10vartha.in"; 
+const REPO_URL = ""; 
 
 // DATA 
 const editions = {
     // ROBOT_ENTRY_POINT
-    "07-02-2026": { pages: 5, pdf: "full.pdf" },
-
-    "06-02-2026": { pages: 5, pdf: "full.pdf" },
-
-    "05-02-2026": { pages: 4, pdf: "full.pdf" },
-
     
-
-    "04-02-2026": { pages: 4, pdf: "full.pdf" },
-
-    "03-02-2026": { pages: 5, pdf: "full.pdf" },
-
-    "02-02-2026": { pages: 6, pdf: "full.pdf" },
-
-    "01-02-2026": { pages: 6, pdf: "full.pdf" },
-
-    "31-01-2026": { pages: 5, pdf: "full.pdf" },
-
-    "30-01-2026": { pages: 4, pdf: "full.pdf" },
-
 };
 
 // --- HELPER FUNCTION: Sort dates (Newest First) ---
