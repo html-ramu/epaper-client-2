@@ -1,42 +1,38 @@
-name: Auto Process Paper
+name: Process Newspaper PDF
 
 on:
   push:
     paths:
-      - 'pdf-upload/**.pdf' # మనం PDF పెట్టినప్పుడు మాత్రమే ఇది ఆన్ అవుతుంది
+      - 'uploads/**.pdf'  # ట్రిగ్గర్ పాయింట్
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  convert-and-publish:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y poppler-utils
-        pip install -r requirements.txt
+      - name: Install Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+          pip install Pillow
 
-    - name: Run Robot Script
-      run: python process_paper.py
+      - name: Run Processing Script
+        run: python scripts/process_pdf.py
 
-    - name: Commit and Push changes
-      run: |
-        git config --global user.name "Auto Robot"
-        git config --global user.email "robot@client-2.in"
-        git add papers/
-        git add app.js
-        git add index.html
-        git add pdf-upload/
-        git commit -m "Auto-processed paper" || echo "No changes to commit"
-        git push
+      - name: Save Changes
+        run: |
+          git config --global user.name "Auto Robot"
+          git config --global user.email "robot@client-2.in"
+          git add papers/ app.js uploads/ index.html assets/
+          git commit -m "Auto-published edition" || echo "No changes to commit"
+          git push
