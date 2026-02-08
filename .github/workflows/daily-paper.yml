@@ -3,7 +3,7 @@ name: Process Newspaper PDF
 on:
   push:
     paths:
-      - 'uploads/**.pdf'  # ట్రిగ్గర్ పాయింట్
+      - 'uploads/**.pdf'  # ట్రిగ్గర్
 
 permissions:
   contents: write
@@ -20,19 +20,25 @@ jobs:
         with:
           python-version: '3.9'
 
+      # FIX: Installing ALL tools (pdf2image + Pillow + Poppler) to avoid errors
       - name: Install Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y poppler-utils
-          pip install Pillow
+          pip install Pillow pdf2image
 
       - name: Run Processing Script
         run: python scripts/process_pdf.py
 
       - name: Save Changes
         run: |
-          git config --global user.name "Auto Robot"
+          git config --global user.name "B10 Robot"
           git config --global user.email "robot@client-2.in"
-          git add papers/ app.js uploads/ index.html assets/
+          # Adding everything carefully
+          git add papers/
+          git add app.js
+          git add uploads/
+          git add index.html
+          git add assets/ || echo "Assets folder unchanged"
           git commit -m "Auto-published edition" || echo "No changes to commit"
           git push
